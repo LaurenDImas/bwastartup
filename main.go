@@ -47,6 +47,7 @@ func main() {
 
 	//campaigns
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 
 	log.Fatal(router.Run(":8800"))
 	//input dari user
