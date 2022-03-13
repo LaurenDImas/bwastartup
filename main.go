@@ -18,6 +18,19 @@ import (
 
 func main() {
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
+	// input := campaign.CreateCampaignInput{}
+	// input.Name = "Penggalangan Dana Startup"
+	// input.ShortDescription = "Short"
+	// input.Description = "Loooonggggg"
+	// input.GoalAmount = 1000000
+	// input.Perks = "hadiah satu, dua, dan tiga"
+	// inputUser, _ := userService.GetUserByID(48)
+	// input.User = inputUser
+	// _, err = campaignService.CreateCampaign(input)
+	// if err != nil {
+	// 	log.Fatal()
+	// }
+
 	dsn := "root:@tcp(127.0.0.1:3306)/golang?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -48,8 +61,9 @@ func main() {
 	//campaigns
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
+	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 
-	log.Fatal(router.Run(":8800"))
+	router.Run(":8800")
 	//input dari user
 	//handler, mapping input dari user -> struct input
 	//service : melakukan maping dari struct input ke struct user

@@ -63,7 +63,7 @@ type CampaignUserFormatter struct {
 }
 
 type CampaignImageFormatter struct {
-	ImageURL  string `jason:"image_url"`
+	ImageURL  string `json:"image_url"`
 	IsPrimary bool   `json:"is_primary"`
 }
 
