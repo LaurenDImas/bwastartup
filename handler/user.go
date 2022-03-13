@@ -158,6 +158,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
 
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	path := "images/" + file.Filename
@@ -168,6 +169,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
 
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	currentUser := c.MustGet("currentUser").(user.User)
@@ -178,6 +180,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
 
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	data := gin.H{"is_uploaded": true}
