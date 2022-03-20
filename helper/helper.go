@@ -1,6 +1,10 @@
 package helper
 
-import "github.com/go-playground/validator/v10"
+import (
+	"fmt"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type Response struct {
 	Meta Meta        `json:"meta"`
@@ -11,6 +15,11 @@ type Meta struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
 	Status  string `json:"status"`
+}
+
+type ErrorMsg struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
 }
 
 func APIResponse(message string, code int, status string, data interface{}) Response {
@@ -28,11 +37,30 @@ func APIResponse(message string, code int, status string, data interface{}) Resp
 	return jsonResponse
 }
 
-func FormatValidationError(err error) []string {
-	var errors []string
-	for _, e := range err.(validator.ValidationErrors) {
-		errors = append(errors, e.Error())
+func getErrorMsg(fe validator.FieldError) string {
+	switch fe.Tag() {
+	case "required":
+		return "This field is required"
+	case "email":
+		return "Must be email format"
+	case "lte":
+		return "Should be less than " + fe.Param()
+	case "gte":
+		return "Should be greater than " + fe.Param()
+	}
+	return "Unknown error"
+}
+
+func FormatValidationError(err error) []ErrorMsg {
+	// var errors []string
+	coral := []string{"blue coral", "staghorn coral", "pillar coral", "elkhorn coral"}
+	fmt.Println(coral)
+
+	out := make([]ErrorMsg, len(err.(validator.ValidationErrors)))
+
+	for i, fe := range err.(validator.ValidationErrors) {
+		out[i] = ErrorMsg{fe.Field(), getErrorMsg(fe)}
 	}
 
-	return errors
+	return out
 }

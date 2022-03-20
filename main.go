@@ -10,10 +10,14 @@ import (
 	"bwastartup/user"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
+
+	webHandler "bwastartup/web/handler"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -63,9 +67,13 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
+	userWebHandler := webHandler.NewUserHandler()
 
 	router := gin.Default()
 	router.Use(cors.Default())
+
+	router.HTMLRender = loadTemplates("./web/templates")
+
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
@@ -88,12 +96,36 @@ func main() {
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	api.POST("/transactions/notification", transactionHandler.GetNotification)
 
-	router.Run(":8800")
+	router.GET("/users", userWebHandler.Index)
+	router.Run(":8001")
 	//input dari user
 	//handler, mapping input dari user -> struct input
 	//service : melakukan maping dari struct input ke struct user
 	//repository
 	//db
+}
+
+func loadTemplates(templatesDir string) multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+
+	layouts, err := filepath.Glob(templatesDir + "/layouts/*.html")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	includes, err := filepath.Glob(templatesDir + "/**/*")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Generate our templates map from our layouts/ and includes/ directories
+	for _, include := range includes {
+		layoutCopy := make([]string, len(layouts))
+		copy(layoutCopy, layouts)
+		files := append(layoutCopy, include)
+		r.AddFromFiles(filepath.Base(include), files...)
+	}
+	return r
 }
 
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {

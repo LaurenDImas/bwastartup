@@ -4,7 +4,10 @@ go 1.17
 
 require github.com/go-playground/validator v9.31.0+incompatible
 
-require github.com/gin-contrib/cors v1.3.1 // indirect
+require (
+	github.com/gin-contrib/cors v1.3.1 // indirect
+	github.com/gin-contrib/multitemplate v0.0.0-20220318012832-e2ee59f3525c // indirect
+)
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
